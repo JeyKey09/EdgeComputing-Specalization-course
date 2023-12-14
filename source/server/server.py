@@ -22,7 +22,7 @@ class UDPHandler(BaseRequestHandler):
                 response = "Model trained"
             case ("log"):
                 print(data.split("\n")[1])
-                reponse = "Logged"
+                response = "Logged"
             case (_):
                 response = "Unknown command"
         self.request.sendall(response.encode())
