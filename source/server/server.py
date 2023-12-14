@@ -12,7 +12,7 @@ class MyServer(TCPServer):
 class UDPHandler(BaseRequestHandler):
     
     def handle(self):
-        data : str = self.request.recv(1024).strip().decode("utf-8d")
+        data : str = self.request.recv(1024).strip().decode("utf-8")
         response : str = "" 
         match (data.split("\n")[0]):
             case ("fetch model"):
