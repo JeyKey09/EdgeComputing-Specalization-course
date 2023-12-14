@@ -43,7 +43,7 @@ while rval:
     frame = cv2.resize(frame, (32, 32)) / 255
     guess = answers[np.argmax(model.predict(np.array([frame]), verbose=0))]
     if guess == "automobile":
-        logtime = datetime.now().strftime("%d-%m-%Y_%H-%M")
+        logtime = datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
         message = f"log\n {logtime} : {guess}"
         sock = socket.create_connection((ip, port), timeout=10)
         sock.sendall(message.encode("utf-8"))

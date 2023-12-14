@@ -4,8 +4,29 @@ from keras.datasets import cifar10
 from keras.layers import Dense, Dropout, Flatten, Conv2D, MaxPooling2D, InputLayer
 from keras.callbacks import EarlyStopping
 from datetime import datetime
+import os
 
+def fetch_model() -> str:
+       """Fetches the latest model from the server
+       
+       Returns:
+              str: The name of the model
+       """
+       if not os.path.isdir("models"):
+              os.mkdir("models")
+       files = os.listdir("models/")
+       files.sort()
+       for file in files:
+              if file.endswith(".keras"):
+                     return file
+       return create_model()
+       
 def create_model() -> str:
+       """Creates a new model and saves it to the models folder
+
+       Returns:
+           str: The filename of the model
+       """
        # Load the data
        (x_train, y_train), (x_test, y_test) = cifar10.load_data()
 
@@ -36,7 +57,7 @@ def create_model() -> str:
 
        model.compile(loss='categorical_crossentropy',optimizer='adam',metrics=['accuracy'])
 
-       model.fit(x_train, y_train, batch_size=128, epochs=10, verbose=1, validation_split=0.1, callbacks=[callback])
+       model.fit(x_train, y_train, batch_size=64, epochs=10, verbose=1, validation_split=0.1, callbacks=[callback])
        
        
        date = datetime.now().strftime("%d-%m-%Y_%H-%M")
