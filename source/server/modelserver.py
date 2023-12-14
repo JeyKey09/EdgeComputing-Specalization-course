@@ -28,7 +28,7 @@ def open_server(port : int):
     Args:
         port (int): the port to open the server on
     """
-    with MyServer(("localhost", port), TCPHandler) as server :
+    with ModelServer(("localhost", port), TCPHandler) as server :
         print("Server started")
         server.serve_forever()
         

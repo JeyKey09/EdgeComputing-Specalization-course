@@ -15,7 +15,7 @@ class TCPHandler(BaseRequestHandler):
         response : str = "" 
         match (data.split("\n")[0]):
             case ("fetch modelserver"):
-                response = self.server.model_path
+                response = self.server.model_path[0] + "\n" + self.server.model_path[1]
             case ("log"):
                 #Fix to log in database
                 print(data.split("\n")[1])
@@ -30,7 +30,7 @@ def open_server(port : int, model_server_adresse : str, model_server_port : int)
     Args:
         port (int): the port to open the server on
     """
-    with MyServer(("localhost", port), (model_server_adresse, model_server_port), TCPHandler) as server :
+    with ManagerServer(("localhost", port), (model_server_adresse, model_server_port), TCPHandler) as server :
         print("Server started")
         server.serve_forever()
         
