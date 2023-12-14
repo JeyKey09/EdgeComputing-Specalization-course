@@ -3,7 +3,7 @@ from socket import socket
 import learning
 from keras import Sequential
 
-class MyServer(TCPServer):
+class ModelServer(TCPServer):
     def __init__(self, server_address, RequestHandlerClass, bind_and_activate=True):
         super().__init__(server_address, RequestHandlerClass, bind_and_activate)
         self.model_path : str =  learning.fetch_model()
@@ -31,7 +31,7 @@ def open_server(port : int):
     Args:
         port (int): the port to open the server on
     """
-    with MyServer(("localhost", port), UDPHandler) as server :
+    with MyServer(("localhost", port), TCPHandler) as server :
         print("Server started")
         server.serve_forever()
         
