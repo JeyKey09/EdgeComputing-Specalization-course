@@ -1,6 +1,5 @@
 from socketserver import TCPServer, BaseRequestHandler
 from socket import socket
-import pickle
 import learning
 from keras import Sequential
 
@@ -9,8 +8,7 @@ class MyServer(TCPServer):
         super().__init__(server_address, RequestHandlerClass, bind_and_activate)
         self.model_path : str =  learning.fetch_model()
       
-class UDPHandler(BaseRequestHandler):
-    
+class TCPHandler(BaseRequestHandler):
     def handle(self):
         data : str = self.request.recv(1024).strip().decode("utf-8")
         response : str = "" 

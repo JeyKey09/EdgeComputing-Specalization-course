@@ -1,8 +1,5 @@
 import cv2
-import pickle
 import keras
-from keras import Sequential
-from keras.layers import MaxPooling2D 
 import socket
 import numpy as np
 from datetime import datetime
