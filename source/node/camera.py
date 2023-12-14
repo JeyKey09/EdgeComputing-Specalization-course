@@ -16,10 +16,11 @@ answers = {0: "airplane",
               9: "truck"}
 
 
-ip = "127.0.0.1"
+manager_ip = "127.0.0.1"
 port = 5000
 
-sock = socket.create_connection((ip, port), timeout=10)
+sock = socket.create_connection((manager_ip, port), timeout=10)
+
 sock.sendall("fetch model".encode())
 model_path : str = sock.recv(4096).strip().decode("utf-8")
 sock.close()

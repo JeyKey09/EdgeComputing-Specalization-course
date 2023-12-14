@@ -18,9 +18,6 @@ class TCPHandler(BaseRequestHandler):
             case ("train model"):
                 self.server.model_path = learning.create_model()
                 response = "Model trained"
-            case ("log"):
-                print(data.split("\n")[1])
-                response = "Logged"
             case (_):
                 response = "Unknown command"
         self.request.sendall(response.encode())
