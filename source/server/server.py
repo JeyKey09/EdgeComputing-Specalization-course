@@ -7,12 +7,12 @@ from keras import Sequential
 class MyServer(TCPServer):
     def __init__(self, server_address, RequestHandlerClass, bind_and_activate=True):
         super().__init__(server_address, RequestHandlerClass, bind_and_activate)
-        self.model_path : str =  learning.create_model()
+        self.model_path : str =  learning.fetch_model()
       
 class UDPHandler(BaseRequestHandler):
     
     def handle(self):
-        data : str = self.request.recv(1024).strip().decode("utf-8")
+        data : str = self.request.recv(1024).strip().decode("utf-8d")
         response : str = "" 
         match (data.split("\n")[0]):
             case ("fetch model"):
@@ -22,7 +22,7 @@ class UDPHandler(BaseRequestHandler):
                 response = "Model trained"
             case ("log"):
                 print(data.split("\n")[1])
-                reponse = "Logged"
+                response = "Logged"
             case (_):
                 response = "Unknown command"
         self.request.sendall(response.encode())
@@ -34,6 +34,7 @@ def open_server(port : int):
         port (int): the port to open the server on
     """
     with MyServer(("localhost", port), UDPHandler) as server :
+        print("Server started")
         server.serve_forever()
         
 if __name__ == "__main__":
