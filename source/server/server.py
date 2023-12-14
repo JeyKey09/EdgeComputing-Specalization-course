@@ -34,3 +34,6 @@ def open_server(port : int):
     """
     with MyServer(("localhost", port), UDPHandler) as server :
         server.serve_forever()
+        
+if __name__ == "__main__":
+    server.open_server(5000)

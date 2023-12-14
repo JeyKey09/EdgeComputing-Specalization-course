@@ -44,7 +44,8 @@ while rval:
     guess = answers[np.argmax(model.predict(np.array([frame]), verbose=0))]
     if guess == "automobile":
         logtime = datetime.now().strftime("%d-%m-%Y_%H-%M")
-        sock.sendall(f"log\nAutomobile detected {logtime}".encode())
+        message = f"log\nAutomobile detected {logtime}"
+        sock.sendall(message.rstrip("\0"))
         print(sock.recv(1024).strip().decode("utf-8"))
     rval, frame = vc.read()
     key = cv2.waitKey(20)
