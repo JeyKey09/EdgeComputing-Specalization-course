@@ -18,7 +18,7 @@ class UDPHandler(BaseRequestHandler):
             case ("fetch model"):
                 response = self.server.model_path
             case ("train model"):
-                model_path = learning.create_model()
+                self.server.model_path = learning.create_model()
                 response = "Model trained"
             case ("log"):
                 print(data.split("\n")[1])
