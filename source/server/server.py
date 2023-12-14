@@ -4,27 +4,28 @@ import pickle
 import learning
 from keras import Sequential
 
-class UDPHandler(BaseRequestHandler):
-    
-    def handle(self):
-        data : str = self.request.recv(1024).strip().decode("utf-8")
-        response : str = ""
-        match (data.split("\n")[0]):
-            case ("fetch model"):
-                response = server.model_path
-            case ("train model"):
-                model_path = learning.create_model()
-                response = "Model trained"
-            case (_):
-                response = "Unknown command"
-        self.request.sendall(response.encode())
-
-
 class MyServer(TCPServer):
     def __init__(self, server_address, RequestHandlerClass, bind_and_activate=True):
         super().__init__(server_address, RequestHandlerClass, bind_and_activate)
         self.model_path : str =  learning.create_model()
-        
+      
+class UDPHandler(BaseRequestHandler):
+    
+    def handle(self):
+        data : str = self.request.recv(1024).strip().decode("utf-8")
+        response : str = "" 
+        match (data.split("\n")[0]):
+            case ("fetch model"):
+                response = self.server.model_path
+            case ("train model"):
+                model_path = learning.create_model()
+                response = "Model trained"
+            case ("log"):
+                print(data.split("\n")[1])
+            case (_):
+                response = "Unknown command"
+        self.request.sendall(response.encode())
+  
 def open_server(port : int):
     """Opens the server
 

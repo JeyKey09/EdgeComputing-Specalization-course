@@ -1,7 +1,23 @@
 import cv2
 import pickle
 import keras
+from keras import Sequential
+from keras.layers import MaxPooling2D 
 import socket
+import numpy as np
+from datetime import datetime
+
+answers = {0: "airplane",
+              1: "automobile",
+              2: "bird",
+              3: "cat",
+              4: "deer",
+              5: "dog",
+              6: "frog",
+              7: "horse",
+              8: "ship",
+              9: "truck"}
+
 
 ip = "127.0.0.1"
 port = 5000
@@ -24,13 +40,16 @@ else:
 
 while rval:
     cv2.imshow("preview", frame)
+    frame = cv2.resize(frame, (32, 32)) / 255
+    guess = answers[np.argmax(model.predict(np.array([frame]), verbose=0))]
+    if guess == "automobile":
+        logtime = datetime.now().strftime("%d-%m-%Y_%H-%M")
+        sock.sendall(f"log\nAutomobile detected {logtime}".encode())
+        print(sock.recv(1024).strip().decode("utf-8"))
     rval, frame = vc.read()
     key = cv2.waitKey(20)
     
     if key == 27: # exit on ESC
-        break
-    elif key == 32: # spacebar to take a picture
-        cv2.imwrite("test.png", frame)
         break
     
 cv2.destroyWindow("preview")
