@@ -24,8 +24,8 @@ port = 5000
 
 sock = socket.create_connection((ip, port), timeout=10)
 sock.sendall("fetch model".encode())
-
-model_path : str = sock.recv(1024).strip().decode("utf-8")
+model_path : str = sock.recv(4096).strip().decode("utf-8")
+sock.close()
 
 model = keras.models.load_model("models/"+model_path)
 
@@ -44,9 +44,11 @@ while rval:
     guess = answers[np.argmax(model.predict(np.array([frame]), verbose=0))]
     if guess == "automobile":
         logtime = datetime.now().strftime("%d-%m-%Y_%H-%M")
-        message = f"log\nAutomobile detected {logtime}"
-        sock.sendall(message.rstrip("\0"))
-        print(sock.recv(1024).strip().decode("utf-8"))
+        message = f"log\n {logtime} : {guess}"
+        sock = socket.create_connection((ip, port), timeout=10)
+        sock.sendall(message.encode("utf-8"))
+        print(sock.recv(4096).strip().decode("utf-8"))
+        sock.close
     rval, frame = vc.read()
     key = cv2.waitKey(20)
     

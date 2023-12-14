@@ -22,6 +22,7 @@ class UDPHandler(BaseRequestHandler):
                 response = "Model trained"
             case ("log"):
                 print(data.split("\n")[1])
+                reponse = "Logged"
             case (_):
                 response = "Unknown command"
         self.request.sendall(response.encode())
@@ -36,4 +37,4 @@ def open_server(port : int):
         server.serve_forever()
         
 if __name__ == "__main__":
-    server.open_server(5000)
+    open_server(5000)
