@@ -1,11 +1,12 @@
 from socketserver import TCPServer, BaseRequestHandler
 import argparse
 import psycopg2
+import socket
 
 class ManagerServer(TCPServer):
     def __init__(self, server_address, model_server_adresse, RequestHandlerClass,  bind_and_activate=True):
         super().__init__(server_address, RequestHandlerClass, bind_and_activate)
-        self.model_server : str =  model_server_adresse
+        self.model_server =  model_server_adresse
       
 class TCPHandler(BaseRequestHandler):
     def handle(self):
@@ -13,7 +14,7 @@ class TCPHandler(BaseRequestHandler):
         response : str = "" 
         match (data.split("\n")[0]):
             case ("fetch modelserver"):
-                response = self.server.model_path[0] + "\n" + self.server.model_path[1]
+                response = f"{self.server.model_server[0]}\n{self.server.model_server[1]}"
             case ("log"):
                 ip_address, timestamp,log_string = data.split("\n")[1].split(":")
 			
@@ -50,7 +51,8 @@ def open_server(port : int, model_server_adresse : str, model_server_port : int)
     Args:
         port (int): the port to open the server on
     """
-    with ManagerServer(("localhost", port), (model_server_adresse, model_server_port), TCPHandler) as server :
+    ip = socket.gethostbyname(socket.gethostname())
+    with ManagerServer((ip, port), (model_server_adresse, model_server_port), TCPHandler) as server :
         print("Server started")
         server.serve_forever()
         
