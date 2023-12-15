@@ -20,7 +20,7 @@ def fetch_model() -> str:
        files = os.listdir(save_path)
        files.sort()
        for file in files:
-              if file.endswith(".keras"):
+              if file.endswith(".h5"):
                      return save_path+file
        return create_model()
        
@@ -79,7 +79,7 @@ def create_model() -> str:
 
        # Save the model
        date = datetime.now().strftime("%d-%m-%Y_%H-%M")
-       filename = f"{save_path}model-{date}.keras"
+       filename = f"{save_path}model-{date}.h5"
        model.save(filename)
 
        return filename
