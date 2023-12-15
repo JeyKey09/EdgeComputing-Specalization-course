@@ -1,9 +1,9 @@
-from socketserver import TCPServer, BaseRequestHandler
+from socketserver import TCPServer, BaseRequestHandler, ThreadingMixIn
 import argparse
 import psycopg2
 import socket
 
-class ManagerServer(TCPServer):
+class ManagerServer(ThreadingMixIn, TCPServer):
     def __init__(self, server_address, model_server_adresse, RequestHandlerClass,  bind_and_activate=True):
         super().__init__(server_address, RequestHandlerClass, bind_and_activate)
         self.model_server =  model_server_adresse
@@ -16,13 +16,13 @@ class TCPHandler(BaseRequestHandler):
             case ("fetch modelserver"):
                 response = f"{self.server.model_server[0]}\n{self.server.model_server[1]}"
             case ("log"):
-                ip_address, timestamp,log_string = data.split("\n")[1].split(":")
+                ip_address, timestamp,log_string = data.split("\n")[1].split("::")
 			
                 try:
                     conn = psycopg2.connect(
                         dbname = "postgres",
-                        user = "userMH",
-                        password = "654321",
+                        user = "user1234",
+                        password = "1234",
                         host="localhost",
                         port = "5432"
                     )
@@ -35,7 +35,6 @@ class TCPHandler(BaseRequestHandler):
                     conn.commit()
                     cursor.close()
                     conn.close()
-                    #Fix to log in database
                     print(data.split("\n")[1])
                     response = "Logged"
                 except  psycopg2.Error as e:
