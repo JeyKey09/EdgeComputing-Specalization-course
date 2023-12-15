@@ -7,19 +7,21 @@ from keras.callbacks import EarlyStopping
 from datetime import datetime
 import os
 
+save_path = "models/"
+
 def fetch_model() -> str:
        """Fetches the latest model from the server
        
        Returns:
               str: The name of the model
        """
-       if not os.path.isdir("models"):
-              os.mkdir("models")
-       files = os.listdir("models/")
+       if not os.path.isdir(save_path):
+              os.mkdir(save_path)
+       files = os.listdir(save_path)
        files.sort()
        for file in files:
               if file.endswith(".keras"):
-                     return file
+                     return save_path+file
        return create_model()
        
 def create_model() -> str:
@@ -29,7 +31,7 @@ def create_model() -> str:
        str: The filename of the model
        """
        # Load the data
-       (x_train, y_train), (x_test, y_test) = cifar10.load_data()
+       (x_train, y_train), (_, _) = cifar10.load_data()
 
        # Reshape and normalize the data
        x_train = x_train.astype('float32') / 255.0
@@ -39,9 +41,6 @@ def create_model() -> str:
 
        # Create the InceptionResNetV2 base model (pre-trained on ImageNet)
        base_model = MobileNetV2(weights='imagenet', include_top=False, input_shape=(32, 32, 3))
-
-       # Freeze the layers of the base model
-
 
        # Create a sequential model
        model = Sequential()
@@ -80,8 +79,8 @@ def create_model() -> str:
 
        # Save the model
        date = datetime.now().strftime("%d-%m-%Y_%H-%M")
-       filename = f"model-{date}.keras"
-       model.save("models/" + filename)
+       filename = f"{save_path}model-{date}.keras"
+       model.save(filename)
 
        return filename
 
