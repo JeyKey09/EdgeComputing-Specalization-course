@@ -1,8 +1,6 @@
 from socketserver import TCPServer, BaseRequestHandler
-from socket import socket
-import learning
-from keras import Sequential
-import sys
+import argparse
+import psycopg2
 
 class ManagerServer(TCPServer):
     def __init__(self, server_address, model_server_adresse, RequestHandlerClass,  bind_and_activate=True):
@@ -15,11 +13,33 @@ class TCPHandler(BaseRequestHandler):
         response : str = "" 
         match (data.split("\n")[0]):
             case ("fetch modelserver"):
-                response = self.server.model_path
+                response = self.server.model_path[0] + "\n" + self.server.model_path[1]
             case ("log"):
-                #Fix to log in database
-                print(data.split("\n")[1])
-                response = "Logged"
+                ip_address, timestamp,log_string = data.split("\n")[1].split(":")
+			
+                try:
+                    conn = psycopg2.connect(
+                        dbname = "postgres",
+                        user = "userMH",
+                        password = "654321",
+                        host="localhost",
+                        port = "5432"
+                    )
+                    cursor = conn.cursor()
+                    cursor.execute(
+                        "INSERT INTO logs (ip_address,timestamp,log_string) VALUES (%s, %s, %s);", 
+                        (ip_address,timestamp,log_string)
+                    )
+			
+                    conn.commit()
+                    cursor.close()
+                    conn.close()
+                    #Fix to log in database
+                    print(data.split("\n")[1])
+                    response = "Logged"
+                except  psycopg2.Error as e:
+                    response = f"Error: {e}"
+                
             case (_):
                 response = "Unknown command"
         self.request.sendall(response.encode())
@@ -30,13 +50,17 @@ def open_server(port : int, model_server_adresse : str, model_server_port : int)
     Args:
         port (int): the port to open the server on
     """
-    with MyServer(("localhost", port), (model_server_adresse, model_server_port), TCPHandler) as server :
+    with ManagerServer(("localhost", port), (model_server_adresse, model_server_port), TCPHandler) as server :
         print("Server started")
         server.serve_forever()
         
 if __name__ == "__main__":
-    arguments = sys.argv
-    if len(arguments) == 3:
-        open_server(int(arguments[1]), arguments[2], int(arguments[3]))
+    parser = argparse.ArgumentParser(description="Manager server")
+    parser.add_argument("--port", type=int, help="Port to open server on")
+    parser.add_argument("--modelIP", type=str, help="Address of the model server")
+    parser.add_argument("--modelPort", type=int, help="Port of the model server")
+    arguments = parser.parse_args()
+    if arguments.port and arguments.modelIP and arguments.modelPort:
+        open_server(arguments.port, arguments.modelIP , arguments.modelPort)
     else:
-        print("Usage: python3 managerserver.py <port> <modelserver ip> <modelserver port>")
+        parser.print_help()
